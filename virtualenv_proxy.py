@@ -1,28 +1,3 @@
-Skip to content
-
-
-  
-Pull requests 
-Issues 
-Marketplace 
-Explore 
-
-
-
-Sign out 
-
-
- Watch 
-21 
- Star 
-21 
-Fork 
-142 
-
-Azure-Samples/python-docs-hello-world 
- Code 
- Issues 5 
- Pull requests 0 
 # ############################################################################
 
  #
