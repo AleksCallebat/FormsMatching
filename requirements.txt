@@ -2,4 +2,3 @@ pip==10.0.1
 setuptools>=38.4.0
 Flask==0.12.2
 werkzeug
-pandas
