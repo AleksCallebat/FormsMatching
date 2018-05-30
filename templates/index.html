@@ -1,0 +1,90 @@
+
+
+
+<!DOCTYPE html> <html lang="en">
+<html>
+<head>
+    <meta id="Viewport" name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <title>Debug Interface</title>
+	<style>
+		@import url(http://fonts.googleapis.com/css?family=Amatic+SC:700);
+		body{
+		    text-align: center;    
+		}
+		h1{
+		    font-family: 'Amatic SC', cursive;
+		    font-weight: normal;
+		    color: #8ac640;
+		    font-size: 2.8em;
+		    line-height:40%;
+		}
+        .inputfile {
+        	width: 0.1px;
+        	height: 0.1px;
+        	opacity: 0;
+        	overflow: hidden;
+        	position: absolute;
+        	z-index: -1;
+        }
+        .inputfile + label {
+            max-width: 100%;
+            width: 204;
+            font-size: 1.25rem;
+            font-family: 'Amatic SC', cursive;
+            /* 20px */
+            font-weight: 700;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+            display: inline-block;
+            overflow: hidden;
+            padding: 0.625rem 1.25rem;
+            margin-bottom: 0.5cm;
+            /* 10px 20px */
+            color: #f1e5e6;
+            background-color: #8ac640;
+        }
+        .inputfile:focus + label,
+        .inputfile.has-focus + label {
+            outline: 1px dotted #000;
+            outline: -webkit-focus-ring-color auto 5px;
+        }
+        .inputfile + label svg {
+            width: 1em;
+            height: 1em;
+            vertical-align: middle;
+            fill: currentColor;
+            margin-top: -0.25em;
+            /* 4px */
+            margin-right: 0.25em;
+            /* 4px */
+        }
+        .inputfile + label:hover {
+            background-color: #722040;
+        }
+	</style>
+</head>
+<body>
+	<div class="block1">
+    <form action="" method=post enctype=multipart/form-data><p>
+    <input type=file name=file accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+    <input type=submit value=Upload>    
+    </form>
+   
+  
+    </div>
+   
+    
+    </div>
+</body>
+</html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script type="text/javascript">
+    
+windows.uploadfile=function(url){
+    console.log(" hey you tried to upload stuff")
+}
+
+
+
+</script>
