@@ -23,7 +23,7 @@ def match_ratio(df,df2,i,j):
         for key in df.keys() :
             if key not in df2.keys():
                 print("WARNING : NOT SAME KEYS")
-            if key not in ['Heure de début', 'Heure de fin', 'Adresse de messagerie', 'Nom','Pour finir, peux-tu nous laisser ton prénom / nom ?']:
+            if key not in ['Heure de debut', 'Heure de fin', 'Adresse de messagerie', 'Nom','Pour finir, peux-tu nous laisser ton prenom / nom ?']:
                 answer_similarity=[]
                 for answer in df[key][i]:
                     if answer in df2[key][j]:
@@ -185,6 +185,6 @@ def upload_file():
                 df=get_all_matches(df2,df)
             df_top=get_top_matches(df)
             return render_template('view.html',tables=[df_top.to_html(classes="df"),df.to_html(classes="df")],
-    titles = ['na',"Meilleure configuration", 'TOUS les résultats'])
+    titles = ['na',"Meilleure configuration", 'TOUS les resultats'])
     return render_template("uploaded.html")
     
