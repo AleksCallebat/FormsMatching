@@ -11,32 +11,45 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 def read_excel(path="Maching.xlsx"):
-    xl = pd.ExcelFile("Maching.xlsx")
+    xl = pd.ExcelFile(path)
     df = xl.parse("Sheet1")
+    print(df.keys())
     return df
 
 def match_ratio(df,df2,i,j):
     ratio=[]
+    score=0
+    count=0
     if df["Nom"][i]==df2["Nom"][j] :
         return -1
     else :
         for key in df.keys() :
-            if key not in df2.keys():
-                print("WARNING : NOT SAME KEYS")
+            if key not in df2.keys() and key not in ['Heure de debut', 'Heure de fin', 'Adresse de messagerie', 'Nom','Pour finir, peux-tu nous laisser ton prenom / nom ?']:
+                print("WARNING : NOT SAME KEYS",key)
             if key not in ['Heure de debut', 'Heure de fin', 'Adresse de messagerie', 'Nom','Pour finir, peux-tu nous laisser ton prenom / nom ?']:
+                count+=1
                 answer_similarity=[]
-                for answer in df[key][i]:
-                    if answer in df2[key][j]:
-                        answer_similarity.append(1)
-                    else :
-                        answer_similarity.append(0)
-                for answer in df2[key][j]:
-                    if answer in df[key][i]:
-                        answer_similarity.append(1)
-                    else :
-                        answer_similarity.append(0)
-                ratio.append(np.mean(answer_similarity))
-        return(np.mean(ratio)) 
+                score+=int(df[key][i]==df2[key][j]) 
+                try:
+                    for answer in df[key][i]:
+                        if answer in df2[key][j]:
+                            answer_similarity.append(1)
+                        else :
+                            pass
+                            answer_similarity.append(0)
+                    for answer in df2[key][j]:
+                        if answer in df[key][i]:
+                            answer_similarity.append(1)
+                        else :
+                            pass
+                            answer_similarity.append(0)
+                    ratio.append(np.mean(answer_similarity))
+                except:
+                    print("big exception",df[key])
+        if score==count:
+            print("full match",df["Nom"][i],df2["Nom"][j])
+        return float(score)/count
+#        return(np.mean(ratio)) 
 
 def seuil(df1,df2,Names,seuil):
     result=[]
@@ -51,17 +64,14 @@ def seuil(df1,df2,Names,seuil):
 def get_all_matches(df1,df2):
     if ("Nom" not in df1.columns) or ("Nom" not in df2.columns):
         return(pd.DataFrame({"ERROR : you must use 'Nom' as matching key between dataframes":[]}))
-    try :
-        result_df=pd.DataFrame(columns=["nom1","nom2","score"])
-        match_df=pd.DataFrame(columns=["Nom"]+df1["Nom"].tolist())
+    result_df=pd.DataFrame(columns=["nom1","nom2","score"])
+    match_df=pd.DataFrame(columns=["Nom"]+df2["Nom"].tolist())
+    #première colonne nom, puis que des colonnes vides
+    for i in range(len(df1["Nom"])):
+        match_df.loc[i]=[df1["Nom"][i]]+[match_ratio(df1,df2,i,j) for j in range(len(df2["Nom"]))]      
 
-        for i in range(len(df2["Nom"])):
-            match_df.loc[i]=[df2["Nom"][i]]+[match_ratio(df1,df2,i,j) for j in range(len(df2["Nom"]))]      
+    result_df=match_df
 
-        result_df=match_df
-    except : 
-        result_df=pd.DataFrame(columns=["Wrong formatting"])
-    #print(result_df)
     return result_df
 
 def get_top_matches(df):
@@ -71,22 +81,25 @@ def get_top_matches(df):
     nom1,nom2,score=[],[],[]
 
     #Create a list with the full arrays that we will empty 
-    nom1_original=df["Nom"].values
+    try:
+        nom1_original=df["Nom"].values
+    except:
+        print("empty array error",df)
     nom2_original=(df.keys().values[1:])
-    score_original=[df[name].values for name in nom1_original]
 
-
-    for j in range(len(df)):
-        
+    print("debug 83",df)
+    score_original=[df[name].values for name in nom2_original]
+    print("debug 84",score_original)
+    for j in range(len(df)):        
         if len(nom1_original)<1 or len(nom2_original)<1:
             #STOP whenever all df2 names are allocated
             break
         else :
             score_original=[]
-            for name in nom1_original :
+            for name in nom2_original :
                 column=[]
                 for j in range(len(df)):
-                    if df["Nom"].values[j] in nom2_original:
+                    if df["Nom"].values[j] in nom1_original:
                         column.append(df[name].values[j])
                 score_original.append(column)
             #print("new score",len(score_original))
@@ -94,16 +107,17 @@ def get_top_matches(df):
 
             # first look to take all the argmaxes
             for k in range(len(nom1_original)):    
-                i=np.argmax(score_original[:][k])
+                i=np.argmax([score[k] for score in score_original])
+                print("checksum",len([score[k] for score in score_original]),len(nom2_original))
                 
                 nom1_temp.append(nom1_original[k])
                 nom=nom2_original[i]
                 nom2_temp.append(nom)
-                score_temp.append(score_original[k][i])
+                score_temp.append(score_original[i][k])
                     
             ### Uncomment if you allow double matches (yes in that case the code should be simple)
-#            nom1,nom2,score=nom1_temp,nom2_temp,score_temp            
- #           break
+            #nom1,nom2,score=nom1_temp,nom2_temp,score_temp            
+            #break
             
             #The idea is to keep all the maximum for a df2 max. It won't always give the optimal solution,
             # but close enough ("algorithme glouton")
@@ -127,7 +141,7 @@ def get_top_matches(df):
                     match[matcher]=matched
                 else :
                     pass
-#          
+          
             #Here we count the columns and line that have not found an optimal match, and keep them inside score_original
  
 
@@ -179,10 +193,15 @@ def upload_file():
             file2.save(os.path.join(app.config['UPLOAD_FOLDER'], "liste2.xlsx"))
             df=(read_excel(os.path.join(app.config['UPLOAD_FOLDER'], "liste1.xlsx")))
             df2=(read_excel(os.path.join(app.config['UPLOAD_FOLDER'], "liste2.xlsx")))
+            df=(read_excel("uploads/liste1.xlsx"))
+            df2=(read_excel("uploads/liste2.xlsx"))
+            
+            #print("debug1",df.keys()==df2.keys(),len(df["Nom"]))
             if len(df)<len(df2):
                 df=get_all_matches(df,df2)
             else:
                 df=get_all_matches(df2,df)
+            print("debug",df)
             df_top=get_top_matches(df)
             return render_template('view.html',tables=[df_top.to_html(classes="df"),df.to_html(classes="df")],
     titles = ['na',"Meilleure configuration", 'TOUS les resultats'])
