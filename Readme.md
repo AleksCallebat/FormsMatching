@@ -2,7 +2,7 @@ This program aims at matching respondents to Microsoft forms, based on their ans
 
 The main interest is the matching part, which is a bit tricky if you want an answer in a reasonnable time
 
-To use, run python runserver.py
+To use, run python main.py
 
 A few dependencies might be needed
 
